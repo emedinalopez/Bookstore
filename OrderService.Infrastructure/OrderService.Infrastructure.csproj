@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EventBus.Messages\EventBus.Messages.csproj" />
+    <ProjectReference Include="..\OrderService.Application\OrderService.Application.csproj" />
+  </ItemGroup>
+
 </Project>

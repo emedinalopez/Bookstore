@@ -1,10 +1,19 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/InventoryService/">
-    <Project Path="InventoryService.Api/InventoryService.Api.csproj" />
-    <Project Path="InventoryService.Application/InventoryService.Application.csproj" />
-    <Project Path="InventoryService.Domain/InventoryService.Domain.csproj" />
-    <Project Path="InventoryService.Infrastructure/InventoryService.Infrastructure.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Api/InventoryService.Api.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Application/InventoryService.Application.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Domain/InventoryService.Domain.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Infrastructure/InventoryService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/OrderService/">
+    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Api/OrderService.Api.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Application/OrderService.Application.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Domain/OrderService.Domain.csproj" />
+    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="../../../../../../../../repos/Bookstore/EventBus.Messages/EventBus.Messages.csproj" />
   </Folder>
   <Folder Name="/tests/" />
 </Solution>
