@@ -1,6 +1,8 @@
 ﻿using InventoryService.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using InventoryService.Application.Books.Queries;
+using MediatR;
 
 namespace InventoryService.Api.Controllers
 {
@@ -8,10 +10,17 @@ namespace InventoryService.Api.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public BookController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDTO>>> GetAllBooks()
         {
-            var books = new List<BookDTO>();
+            var books = await _mediator.Send(new GetAllBooksQuery());
             return Ok(books);
         }
 
