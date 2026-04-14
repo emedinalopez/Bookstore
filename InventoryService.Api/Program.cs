@@ -14,7 +14,8 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 builder.Services.AddScoped<IInventoryDbContext, InventoryDbContext>();
 builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(GetAllBooksQuery).Assembly));
 
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -26,6 +27,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
 }
 
 app.UseHttpsRedirection();

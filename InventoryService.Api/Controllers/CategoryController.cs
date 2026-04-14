@@ -1,6 +1,8 @@
 ﻿using InventoryService.Application.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using InventoryService.Application.Categories.Queries;
 
 namespace InventoryService.Api.Controllers
 {
@@ -8,10 +10,18 @@ namespace InventoryService.Api.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
+        private readonly IMediator _mediator;
+
+        public CategoryController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        //GET: api/category
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
         {
-            var categories = new List<CategoryDTO>();
+            var categories = await _mediator.Send(new GetAllCategoriesQuery());
             return Ok(categories);
         }
 
