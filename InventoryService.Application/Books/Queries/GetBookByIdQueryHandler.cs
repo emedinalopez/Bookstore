@@ -1,10 +1,7 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using InventoryService.Application.DTOs;
+﻿using InventoryService.Application.DTOs;
 using InventoryService.Application.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryService.Application.Books.Queries
 {

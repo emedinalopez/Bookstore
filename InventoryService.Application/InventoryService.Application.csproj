@@ -15,8 +15,4 @@
     <ProjectReference Include="..\InventoryService.Domain\InventoryService.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Books\Commands\" />
-  </ItemGroup>
-
 </Project>
