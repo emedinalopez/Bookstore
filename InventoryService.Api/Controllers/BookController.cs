@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using InventoryService.Application.Books.Queries;
+using InventoryService.Application.Books.Commands;
 using MediatR;
 
 namespace InventoryService.Api.Controllers
@@ -27,7 +28,7 @@ namespace InventoryService.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BookDTO>> GetBookById(int id)
         {
-            var book = await _mediator.Send(new GetBooksByIdQuery { GetBookById = id });
+            var book = await _mediator.Send(new GetBookByIdQuery { BookId = id });
             return book != null ? Ok(book) : NotFound();
         }
 
@@ -36,7 +37,7 @@ namespace InventoryService.Api.Controllers
         public async Task<ActionResult<BookDTO>> CreateBook([FromBody] CreateBookCommand command)
         {
             var createdBook = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
+            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.ID }, createdBook);
         }
 
         //PUT: api/book/{id}
