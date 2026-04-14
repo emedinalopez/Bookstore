@@ -27,26 +27,37 @@ namespace InventoryService.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BookDTO>> GetBookById(int id)
         {
-            var book = new BookDTO();
-            return Ok(book);
+            var book = await _mediator.Send(new GetBooksByIdQuery { GetBookById = id });
+            return book != null ? Ok(book) : NotFound();
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<BookDTO>> CreateBook(int id, [FromBody] BookDTO book)
-        {
-            throw new NotImplementedException();
-        }
-
+        //POST: api/book
         [HttpPost]
-        public async Task<IActionResult> UpdateBook([FromBody] BookDTO book)
+        public async Task<ActionResult<BookDTO>> CreateBook([FromBody] CreateBookCommand command)
         {
-            throw new NotImplementedException();
+            var createdBook = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
         }
 
+        //PUT: api/book/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] UpdateBookCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("Id does not match in route vs body");
+            }
+
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        //DELETE: api/book/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            throw new NotImplementedException();
+            await _mediator.Send(new DeleteBookCommand { Id = id });
+            return NoContent();
         }
     }
 }
