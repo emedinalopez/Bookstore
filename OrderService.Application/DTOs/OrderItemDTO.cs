@@ -1,6 +1,6 @@
 ﻿namespace OrderService.Application.DTOs
 {    
-    public class OrderItemDto
+    public class OrderItemDTO
     {
         public int Id { get; set; }
         public int BookId { get; set; }
