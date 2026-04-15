@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderService.Application.Interfaces;
 using OrderService.Infrastructure.Persistence;
+using OrderService.Application.Orders.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var connectionString = builder.Configuration.GetConnectionString("OrderConnectio
 builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderDbContext, OrderDbContext>();
-//builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderCommand).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderCommand).Assembly));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -21,6 +22,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
