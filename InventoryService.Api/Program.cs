@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using InventoryService.Application.Interfaces;
 using InventoryService.Infrastructure.Persistence;
 using InventoryService.Application.Books.Queries;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
@@ -13,6 +13,13 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 
 builder.Services.AddScoped<IInventoryDbContext, InventoryDbContext>();
 builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(GetAllBooksQuery).Assembly));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {        
+        options.Authority = builder.Configuration["Authentication:Authority"];
+        options.Audience = builder.Configuration["Authentication:Audience"];
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -34,6 +41,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using InventoryService.Application.Books.Queries;
 using InventoryService.Application.Books.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryService.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class BookController : ControllerBase
     {
         private readonly IMediator _mediator;

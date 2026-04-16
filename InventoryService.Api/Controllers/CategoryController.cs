@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using InventoryService.Application.Categories.Queries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InventoryService.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly IMediator _mediator;

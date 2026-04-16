@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.Orders.Commands;
 using OrderService.Application.Orders.Queries;
 using OrderService.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OrderService.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    //[Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IMediator _mediator;
