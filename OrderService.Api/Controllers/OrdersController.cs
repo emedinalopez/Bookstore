@@ -17,6 +17,16 @@ namespace OrderService.Api.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAllOrders()
+        {
+            var query = new GetAllOrdersQuery();
+
+            var orders = await _mediator.Send(query);
+
+            return Ok(orders);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
         {
