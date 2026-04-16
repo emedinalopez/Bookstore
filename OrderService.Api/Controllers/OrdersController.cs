@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.Orders.Commands;
+using OrderService.Application.Orders.Queries;
 using OrderService.Application.DTOs;
 
 namespace OrderService.Api.Controllers
@@ -14,6 +15,21 @@ namespace OrderService.Api.Controllers
         public OrdersController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderDTO>> GetOrderById(int id)
+        {
+            var query = new GetOrderByIdQuery { Id = id };
+
+            var order = await _mediator.Send(query);
+            
+            if (order == null)
+            {
+                return NotFound();
+            }
+            
+            return Ok(order);
         }
 
         [HttpPost]
