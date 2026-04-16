@@ -22,6 +22,20 @@ namespace OrderService.Api.Controllers
             var createdOrder = await _mediator.Send(command);
                         
             return Ok(createdOrder);
-        }        
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOrder(int id, [FromBody] UpdateOrderCommand command)
+        {            
+            if (command == null)
+            {
+                return BadRequest();
+            }
+            command.Id = id;
+
+            await _mediator.Send(command);
+            
+            return NoContent();
+        }
     }
 }
