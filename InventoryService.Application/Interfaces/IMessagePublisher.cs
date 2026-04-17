@@ -2,6 +2,6 @@
 {
     public interface IMessagePublisher
     {
-        void Publish(object message);
+        Task PublishAsync(object message);
     }
 }

@@ -1,4 +1,5 @@
-﻿using InventoryService.Application.DTOs;
+﻿using EventBus.Messages;
+using InventoryService.Application.DTOs;
 using InventoryService.Application.Interfaces;
 using InventoryService.Domain.Entities;
 using MediatR;
@@ -8,10 +9,12 @@ namespace InventoryService.Application.Books.Commands
     public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, BookDTO>
     {
         private readonly IInventoryDbContext _context;
+        private readonly IMessagePublisher _publisher;
 
-        public CreateBookCommandHandler(IInventoryDbContext context)
+        public CreateBookCommandHandler(IInventoryDbContext context, IMessagePublisher publisher)
         {
             _context = context;
+            _publisher = publisher;
         }
 
         public async Task<BookDTO> Handle(CreateBookCommand request, CancellationToken cancellationToken)
@@ -28,6 +31,14 @@ namespace InventoryService.Application.Books.Commands
 
             _context.Books.Add(bookEntity);
             await _context.SaveChangesAsync(cancellationToken);
+
+            var integrationEvent = new BookStockChangedIntegrationEvent
+            {
+                BookId = bookEntity.Id,
+                NewStockQuantity = bookEntity.StockQty
+            };
+
+            await _publisher.PublishAsync(integrationEvent);
 
             return new BookDTO
             {
