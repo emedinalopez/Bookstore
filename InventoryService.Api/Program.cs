@@ -8,7 +8,7 @@ using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("InventoryConnection");
 var rabbitMqConnection = builder.Configuration.GetConnectionString("RabbitMqConnection");
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
