@@ -22,8 +22,8 @@ namespace InventoryService.Infrastructure.Messaging
             if (_channel == null)
             {                
                 var connection = await _connectionTask;
-                var channel = await connection.CreateChannelAsync();                                
-                await channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Topic, true);
+                _channel = await connection.CreateChannelAsync();                                
+                await _channel.ExchangeDeclareAsync(ExchangeName, ExchangeType.Topic, true);
             }
         }
 
