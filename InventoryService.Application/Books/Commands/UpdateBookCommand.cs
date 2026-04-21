@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using InventoryService.Application.DTOs;
+using MediatR;
 
 namespace InventoryService.Application.Books.Commands
 {
-    public class UpdateBookCommand : IRequest
+    public class UpdateBookCommand : IRequest<BookDTO>
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
