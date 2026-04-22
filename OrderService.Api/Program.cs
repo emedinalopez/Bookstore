@@ -3,6 +3,7 @@ using OrderService.Application.Interfaces;
 using OrderService.Infrastructure.Persistence;
 using OrderService.Application.Orders.Commands;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using OrderService.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<OrderDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IOrderDbContext, OrderDbContext>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOrderCommand).Assembly));
+builder.Services.AddHostedService<InventoryEventSubscriberService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
