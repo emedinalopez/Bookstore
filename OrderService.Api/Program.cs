@@ -19,7 +19,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {        
         options.Authority = builder.Configuration["Authentication:Authority"];
-        options.Audience = builder.Configuration["Authentication:Audience"];        
+        options.Audience = builder.Configuration["Authentication:ValidAudience"];
+        options.RequireHttpsMetadata = false;
     });
 
 builder.Services.AddEndpointsApiExplorer();
