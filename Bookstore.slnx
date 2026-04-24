@@ -1,19 +1,21 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/InventoryService/">
-    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Api/InventoryService.Api.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Application/InventoryService.Application.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Domain/InventoryService.Domain.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/InventoryService.Infrastructure/InventoryService.Infrastructure.csproj" />
+    <Project Path="InventoryService.Api/InventoryService.Api.csproj" />
+    <Project Path="InventoryService.Application.UnitTests/InventoryService.Application.UnitTests.csproj" Id="92708c18-74c7-4442-8d95-7dde12e9e451" />
+    <Project Path="InventoryService.Application/InventoryService.Application.csproj" />
+    <Project Path="InventoryService.Domain/InventoryService.Domain.csproj" />
+    <Project Path="InventoryService.Infrastructure/InventoryService.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/OrderService/">
-    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Api/OrderService.Api.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Application/OrderService.Application.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Domain/OrderService.Domain.csproj" />
-    <Project Path="../../../../../../../../repos/Bookstore/OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
+    <Project Path="OrderService.Api/OrderService.Api.csproj" />
+    <Project Path="OrderService.Application.UnitTests/OrderService.Application.UnitTests.csproj" Id="ff8b3fc0-6cb7-4741-849b-eb8b0cffcca3" />
+    <Project Path="OrderService.Application/OrderService.Application.csproj" />
+    <Project Path="OrderService.Domain/OrderService.Domain.csproj" />
+    <Project Path="OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
-    <Project Path="../../../../../../../../repos/Bookstore/EventBus.Messages/EventBus.Messages.csproj" />
+    <Project Path="EventBus.Messages/EventBus.Messages.csproj" />
   </Folder>
   <Folder Name="/tests/" />
 </Solution>
