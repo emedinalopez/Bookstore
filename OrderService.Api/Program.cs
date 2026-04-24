@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using OrderService.Application.Interfaces;
-using OrderService.Infrastructure.Persistence;
 using OrderService.Application.Orders.Commands;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using OrderService.Infrastructure.Messaging;
+using OrderService.Infrastructure.Persistence;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,19 +25,49 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {        
+        document.Info ??= new Microsoft.OpenApi.OpenApiInfo();
+        document.Info.Title = "Order Service API";
+        document.Info.Version = "v1";
+
+        var schemeName = "Bearer";
+                
+        var securityScheme = new Microsoft.OpenApi.OpenApiSecurityScheme
+        {
+            Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description = "JWT Authorization header using the Bearer scheme."
+        };
+
+        // Add the scheme to the document's components
+        document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes[schemeName] = securityScheme;
+
+        // Apply the scheme globally as a requirement
+        var requirement = new Microsoft.OpenApi.OpenApiSecurityRequirement();
+        var schemeReference = new Microsoft.OpenApi.OpenApiSecuritySchemeReference(schemeName, document);
+        requirement[schemeReference] = new List<string>();
+
+        document.Security ??= new List<Microsoft.OpenApi.OpenApiSecurityRequirement>();
+        document.Security.Add(requirement);
+
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

@@ -4,7 +4,11 @@ using InventoryService.Infrastructure.Messaging;
 using InventoryService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
+using Microsoft.AspNetCore.OpenApi;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,34 +25,61 @@ builder.Services.AddSingleton(sp =>
     var factory = new ConnectionFactory() { Uri = new Uri(rabbitMqConnection) };
     return factory.CreateConnectionAsync();
 });
-    
+
 builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
 builder.Services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(typeof(GetAllBooksQuery).Assembly));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
-    {        
+    {
         options.Authority = builder.Configuration["Authentication:Authority"];
         options.Audience = builder.Configuration["Authentication:ValidAudience"];
         options.RequireHttpsMetadata = false;
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        var schemeName = "Bearer";
+                
+        var securityScheme = new Microsoft.OpenApi.OpenApiSecurityScheme
+        {
+            Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description = "JWT Authorization header using the Bearer scheme."
+        };
+                
+        document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+                
+        if (document.Components.SecuritySchemes == null)
+        {
+            document.Components.SecuritySchemes = new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
+        }
+        document.Components.SecuritySchemes[schemeName] = securityScheme;
+                
+        var requirement = new Microsoft.OpenApi.OpenApiSecurityRequirement();        
+        var schemeReference = new Microsoft.OpenApi.OpenApiSecuritySchemeReference(schemeName, document);
+        
+        requirement[schemeReference] = new List<string>();
+                
+        document.Security ??= new List<Microsoft.OpenApi.OpenApiSecurityRequirement>();
+        document.Security.Add(requirement);
+
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
+{    
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
+    app.MapScalarApiReference(); 
 }
 
 app.UseHttpsRedirection();
