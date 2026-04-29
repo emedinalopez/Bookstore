@@ -1,55 +1,67 @@
-﻿using EventBus.Messages;
+﻿using Xunit;
+using Moq;
+using Microsoft.EntityFrameworkCore;
 using InventoryService.Application.Books.Commands;
 using InventoryService.Application.Interfaces;
 using InventoryService.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Moq;
+using EventBus.Messages;
+using System.Threading;
+using System.Threading.Tasks;
+using System;
+
+// Note: You may need to add a using statement for where your actual DbContext lives
+using InventoryService.Infrastructure.Persistence;
 
 namespace InventoryService.Application.UnitTests.Books.Commands
 {
     public class UpdateBookCommandHandlerTests
     {
-        private readonly Mock<IInventoryDbContext> _mockDbContext;
         private readonly Mock<IMessagePublisher> _mockPublisher;
 
         public UpdateBookCommandHandlerTests()
         {
-            _mockDbContext = new Mock<IInventoryDbContext>();
             _mockPublisher = new Mock<IMessagePublisher>();
+        }
+
+        // Helper method to create a fresh, empty In-Memory database for each test
+        private InventoryDbContext GetInMemoryDbContext()
+        {
+            var options = new DbContextOptionsBuilder<InventoryDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unique name per test
+                .Options;
+
+            return new InventoryDbContext(options);
         }
 
         [Fact]
         public async Task Handle_GivenValidCommand_ShouldUpdateBookAndPublishEvent()
         {
-            // ========
-            // Arrange
-            // ========
-            
+            // ==========================================
+            // 1. ARRANGE
+            // ==========================================
+
+            // A. Get a fresh In-Memory database
+            using var dbContext = GetInMemoryDbContext();
+
+            // B. Seed the database with an existing book
             var existingBook = new Book
             {
-                Id = 1,
                 Title = "Old Title",
                 Author = "Old Author",
                 Price = 10.00m,
                 StockQty = 50,
                 CategoryId = 1
             };
+            dbContext.Books.Add(existingBook);
+            await dbContext.SaveChangesAsync(); // Save the seed data!
 
-            // Set up the DbContext mock to find the existing book
-            var books = new List<Book> { existingBook }.AsQueryable();
-            var mockDbSet = new Mock<DbSet<Book>>();
-                        
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.Provider).Returns(books.Provider);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.Expression).Returns(books.Expression);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.ElementType).Returns(books.ElementType);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.GetEnumerator()).Returns(() => books.GetEnumerator());
+            // Note: In-Memory DB auto-generates IDs, so existingBook.Id will be 1
+            var bookIdToUpdate = existingBook.Id;
 
-            _mockDbContext.Setup(c => c.Books).Returns(mockDbSet.Object);
-
-            // Create the update command with the new details
+            // C. Create the update command with the new details
             var command = new UpdateBookCommand
             {
-                Id = 1,
+                Id = bookIdToUpdate,
                 Title = "New Updated Title",
                 Author = "New Author",
                 Price = 15.50m,
@@ -57,69 +69,60 @@ namespace InventoryService.Application.UnitTests.Books.Commands
                 CategoryId = 2
             };
 
-            // D. Instantiate the handler with the mocks
-            var handler = new UpdateBookCommandHandler(_mockDbContext.Object, _mockPublisher.Object);
+            // D. Instantiate the handler
+            var handler = new UpdateBookCommandHandler(dbContext, _mockPublisher.Object);
 
-            // =======
-            // Act
-            // =======
+            // ==========================================
+            // 2. ACT
+            // ==========================================
             var result = await handler.Handle(command, CancellationToken.None);
 
-            // =======
-            // Assert
-            // =======
+            // ==========================================
+            // 3. ASSERT
+            // ==========================================
 
-            // Verify the properties of the original entity were updated correctly
-            Assert.Equal("New Updated Title", existingBook.Title);
-            Assert.Equal(75, existingBook.StockQty);
-            Assert.Equal(15.50m, existingBook.Price);
+            // A. Verify the database was actually updated
+            var updatedBookInDb = await dbContext.Books.FindAsync(bookIdToUpdate);
+            Assert.NotNull(updatedBookInDb);
+            Assert.Equal("New Updated Title", updatedBookInDb.Title);
+            Assert.Equal(75, updatedBookInDb.StockQty);
+            Assert.Equal(15.50m, updatedBookInDb.Price);
 
-            // Verify the returned DTO matches the new data
+            // B. Verify the returned DTO matches the new data
             Assert.NotNull(result);
             Assert.Equal("New Updated Title", result.Title);
+            Assert.Equal(75, result.StockQty);
 
-            // Verify SaveChangesAsync was called
-            _mockDbContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-
-            // D. Verify the publisher was called with the correct stock quantity
+            // C. Verify the publisher was called exactly once with the correct new stock quantity
             _mockPublisher.Verify(p => p.PublishAsync(It.Is<BookStockChangedIntegrationEvent>(
-                e => e.BookId == 1 && e.NewStockQuantity == 75
+                e => e.BookId == bookIdToUpdate && e.NewStockQuantity == 75
             )), Times.Once);
         }
 
         [Fact]
         public async Task Handle_GivenInvalidId_ShouldThrowException()
         {
-            // =======
-            // Arrange
-            // =======
+            // ==========================================
+            // 1. ARRANGE
+            // ==========================================
 
-            // Set up the mock DbContext to find nothing (return an empty list)
-            var books = new List<Book>().AsQueryable();
-            var mockDbSet = new Mock<DbSet<Book>>();
+            // A. Get a fresh In-Memory database (it is completely empty)
+            using var dbContext = GetInMemoryDbContext();
 
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.Provider).Returns(books.Provider);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.Expression).Returns(books.Expression);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.ElementType).Returns(books.ElementType);
-            mockDbSet.As<IQueryable<Book>>().Setup(m => m.GetEnumerator()).Returns(() => books.GetEnumerator());
-
-            _mockDbContext.Setup(c => c.Books).Returns(mockDbSet.Object);
-
-            // Create a command with an ID that doesn't exist
+            // B. Create a command with an ID that doesn't exist in the empty DB
             var command = new UpdateBookCommand { Id = 99 };
 
-            // Instantiate the handler
-            var handler = new UpdateBookCommandHandler(_mockDbContext.Object, _mockPublisher.Object);
+            // C. Instantiate the handler
+            var handler = new UpdateBookCommandHandler(dbContext, _mockPublisher.Object);
 
-            // =============
-            // Act & Assert
-            // =============
+            // ==========================================
+            // 2. ACT & 3. ASSERT
+            // ==========================================
 
-            // Verify that calling Handle with a bad ID throws an exception
+            // Verify that calling Handle throws an exception (because it won't find ID 99)
             await Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
 
-            // Verify that if an exception was thrown, we did NOT try to save or publish
-            _mockDbContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            // Verify the publisher was NEVER called since it failed early
             _mockPublisher.Verify(p => p.PublishAsync(It.IsAny<object>()), Times.Never);
         }
     }

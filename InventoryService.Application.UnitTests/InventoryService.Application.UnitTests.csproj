@@ -20,6 +20,7 @@
     <ProjectReference Include="..\EventBus.Messages\EventBus.Messages.csproj" />
     <ProjectReference Include="..\InventoryService.Application\InventoryService.Application.csproj" />
     <ProjectReference Include="..\InventoryService.Domain\InventoryService.Domain.csproj" />
+    <ProjectReference Include="..\InventoryService.Infrastructure\InventoryService.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
