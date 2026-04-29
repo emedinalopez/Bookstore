@@ -24,7 +24,8 @@ namespace InventoryService.Application.Books.Commands
             if (bookEntity == null)
             {
                 //TODO: Log this warning and avoid execution of next tasks
-                Console.WriteLine($"Book not found.");                
+                Console.WriteLine($"Book not found.");
+                return;
             }
 
             _context.Books.Remove(bookEntity);
