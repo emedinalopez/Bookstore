@@ -11,12 +11,8 @@ namespace InventoryService.Application.UnitTests.Books.Commands
     {        
         [Fact]
         public async Task Handle_GivenValidCommand_ShouldCreateBookAndPublishEvent()
-        {
-            // ==========================================
-            // Arrange
-            // ==========================================
-
-            // Set up the In-Memory Database            
+        {            
+            // Arrange            
             var dbOptions = new DbContextOptionsBuilder<DbContext>()
                 .UseInMemoryDatabase(databaseName: $"InventoryDb_{System.Guid.NewGuid()}")
                 .Options;
@@ -25,11 +21,8 @@ namespace InventoryService.Application.UnitTests.Books.Commands
             var mockDbSet = new Mock<DbSet<Book>>();
 
             mockDbContext.Setup(c => c.Books).Returns(mockDbSet.Object);
-
-            // Set up the Mock Message Publisher
-            var mockPublisher = new Mock<IMessagePublisher>();
-
-            // C. Create the Command (the input data)
+                        
+            var mockPublisher = new Mock<IMessagePublisher>();            
             var command = new CreateBookCommand
             {
                 Title = "The Lord of the Rings",
@@ -38,20 +31,13 @@ namespace InventoryService.Application.UnitTests.Books.Commands
                 StockQty = 100,
                 CategoryId = 1
             };
-
-            // Instantiate the Handler
+            
             var handler = new CreateBookCommandHandler(mockDbContext.Object, mockPublisher.Object);
 
-            // ==========================================
             // Act
-            // ==========================================
-
             var result = await handler.Handle(command, CancellationToken.None);
-
-            // ==========================================
+            
             // Assert
-            // ==========================================
-
             // Verify the handler returned a valid DTO
             Assert.NotNull(result);
             Assert.Equal("The Lord of the Rings", result.Title);

@@ -1,14 +1,10 @@
-﻿using Xunit;
-using Moq;
-using Microsoft.EntityFrameworkCore;
+﻿using EventBus.Messages;
 using InventoryService.Application.Books.Commands;
 using InventoryService.Application.Interfaces;
 using InventoryService.Domain.Entities;
-using EventBus.Messages;
-using System.Threading;
-using System.Threading.Tasks;
-using System;
 using InventoryService.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace InventoryService.Application.UnitTests.Books.Commands
 {
@@ -32,11 +28,8 @@ namespace InventoryService.Application.UnitTests.Books.Commands
 
         [Fact]
         public async Task Handle_GivenValidId_ShouldDeleteBookAndPublishEvent()
-        {
-            // =========
-            // Arrange
-            // =========
-                        
+        {            
+            // Arrange  
             await using var dbContext = GetInMemoryDbContext();
             
             var bookToDelete = new Book
@@ -53,16 +46,11 @@ namespace InventoryService.Application.UnitTests.Books.Commands
             var bookId = bookToDelete.Id;
             var command = new DeleteBookCommand { Id = bookId };            
             var handler = new DeleteBookCommandHandler(dbContext, _mockPublisher.Object);
-
-            // ======
-            // Act
-            // ======
+            
+            // Act            
             await handler.Handle(command, CancellationToken.None);
-
-            // ========
-            // Assert
-            // ========
-            // 
+                        
+            // Assert            
             var bookInDb = await dbContext.Books.FindAsync(bookId);
             Assert.Null(bookInDb);
             
@@ -73,25 +61,16 @@ namespace InventoryService.Application.UnitTests.Books.Commands
 
         [Fact]
         public async Task Handle_GivenInvalidId_ShouldDoNothing()
-        {
-            // =========
-            // Arrange
-            // =========
-                        
+        {            
+            // Arrange  
             await using var dbContext = GetInMemoryDbContext();            
             var command = new DeleteBookCommand { Id = 99 };
             var handler = new DeleteBookCommandHandler(dbContext, _mockPublisher.Object);
-
-            // ======
-            // Act
-            // ======
             
+            // Act
             await handler.Handle(command, CancellationToken.None);
 
-            // ========
-            // Assert
-            // ========
-                        
+            // Assert   
             _mockPublisher.Verify(p => p.PublishAsync(It.IsAny<object>()), Times.Never);
         }
     }

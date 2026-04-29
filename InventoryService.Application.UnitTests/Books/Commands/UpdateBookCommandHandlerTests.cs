@@ -28,11 +28,8 @@ namespace InventoryService.Application.UnitTests.Books.Commands
 
         [Fact]
         public async Task Handle_GivenValidCommand_ShouldUpdateBookAndPublishEvent()
-        {
-            // ========
-            // Arrange
-            // ========
-                        
+        {            
+            // Arrange  
             using var dbContext = GetInMemoryDbContext();
                         
             var existingBook = new Book
@@ -60,16 +57,11 @@ namespace InventoryService.Application.UnitTests.Books.Commands
             };
                         
             var handler = new UpdateBookCommandHandler(dbContext, _mockPublisher.Object);
-
-            // ========
-            // Act
-            // ========
+            
+            // Act            
             var result = await handler.Handle(command, CancellationToken.None);
-
-            // ========
+                        
             // Assert
-            // ========
-
             // Verify the database was actually updated
             var updatedBookInDb = await dbContext.Books.FindAsync(bookIdToUpdate);
             Assert.NotNull(updatedBookInDb);
@@ -90,19 +82,14 @@ namespace InventoryService.Application.UnitTests.Books.Commands
 
         [Fact]
         public async Task Handle_GivenInvalidId_ShouldThrowException()
-        {
-            // =========
-            // Arrange
-            // =========                        
+        {            
+            // Arrange            
             using var dbContext = GetInMemoryDbContext();            
             
             var command = new UpdateBookCommand { Id = 99 };            
             var handler = new UpdateBookCommandHandler(dbContext, _mockPublisher.Object);
-
-            // ==============
+            
             // Act & Assert
-            // ==============
-
             // Verify that calling Handle throws an exception
             await Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
 
