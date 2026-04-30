@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bookstore.Common\Bookstore.Common.csproj" />
     <ProjectReference Include="..\EventBus.Messages\EventBus.Messages.csproj" />
     <ProjectReference Include="..\InventoryService.Domain\InventoryService.Domain.csproj" />
   </ItemGroup>

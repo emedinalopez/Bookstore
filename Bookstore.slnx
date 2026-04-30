@@ -15,6 +15,7 @@
     <Project Path="OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
+    <Project Path="Bookstore.Common/Bookstore.Common.csproj" Id="ee7e9ec5-3349-4bf5-8cfb-b271f85c99fe" />
     <Project Path="EventBus.Messages/EventBus.Messages.csproj" />
   </Folder>
   <Folder Name="/tests/" />

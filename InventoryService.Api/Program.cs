@@ -4,10 +4,7 @@ using InventoryService.Infrastructure.Messaging;
 using InventoryService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
-using Microsoft.AspNetCore.OpenApi;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,6 +78,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(); 
 }
+
+app.UseMiddleware<Bookstore.Common.Middleware.GlobalExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

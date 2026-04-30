@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bookstore.Common\Bookstore.Common.csproj" />
     <ProjectReference Include="..\InventoryService.Application\InventoryService.Application.csproj" />
     <ProjectReference Include="..\InventoryService.Infrastructure\InventoryService.Infrastructure.csproj" />
   </ItemGroup>
