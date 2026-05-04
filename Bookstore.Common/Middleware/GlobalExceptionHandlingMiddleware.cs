@@ -45,6 +45,19 @@ namespace Bookstore.Common.Middleware
                     result = JsonSerializer.Serialize(new { error = notFoundEx.Message });
                     break;
 
+                case ValidationException validationEx:
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    
+                    if (validationEx.Errors.Count > 0)
+                    {
+                        result = JsonSerializer.Serialize(new { errors = validationEx.Errors });
+                    }
+                    else
+                    {
+                        result = JsonSerializer.Serialize(new { error = validationEx.Message });
+                    }
+                    break;
+
                 // TODO: Add more exceptions and their corresponding status codes and messages here
 
                 default:
