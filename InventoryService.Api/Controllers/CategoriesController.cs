@@ -1,9 +1,11 @@
-﻿using InventoryService.Application.DTOs;
+﻿using InventoryService.Application.Categories.Commands;
+using InventoryService.Application.Categories.Queries;
+using InventoryService.Application.DTOs;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MediatR;
-using InventoryService.Application.Categories.Queries;
-using Microsoft.AspNetCore.Authorization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace InventoryService.Api.Controllers
 {
@@ -27,22 +29,43 @@ namespace InventoryService.Api.Controllers
             return Ok(categories);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<CategoryDTO>> CreateCategory([FromBody] CategoryDTO categoryDTO)
+        [HttpGet("{id}")]        
+        public async Task<IActionResult> GetCategoryById(int id)
         {
-            throw new NotImplementedException();
+            var category = await _mediator.Send(new GetCategoryByIdQuery { Id = id });
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(category);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CategoryDTO>> CreateCategory([FromBody] CreateCategoryCommand command)
+        {
+            var createdCategory = await _mediator.Send(command);            
+            return CreatedAtAction(nameof(GetAllCategories), new { id = createdCategory.Id }, createdCategory);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDTO)
-        {  
-            throw new NotImplementedException(); 
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("Route ID does not match command ID.");
+            }
+
+            var updatedCategory = await _mediator.Send(command);
+            return Ok(updatedCategory);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            await _mediator.Send(new DeleteCategoryCommand { Id = id });
+            return NoContent();
         }
     }
 }
