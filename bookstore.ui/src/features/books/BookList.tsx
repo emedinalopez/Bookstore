@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BookDto } from '../../models/book';
 import { getBooks } from '../../api/inventoryApi';
 import { useKeycloak } from '@react-keycloak/web';
@@ -53,7 +54,7 @@ export const BookList: React.FC = () => {
                         {books.map(book => (
                             <tr key={book.id}>
                                 <td>{book.id}</td>
-                                <td>{book.title}</td>
+                                <td><Link to={`/books/${book.id}`}>{book.title}</Link></td>
                                 <td>{book.author}</td>
                                 <td>${book.price.toFixed(2)}</td>
                                 <td>{book.stockQty}</td>
