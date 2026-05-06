@@ -71,6 +71,19 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+const string allowSpecificOrigins = "bookstore";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -82,6 +95,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<Bookstore.Common.Middleware.GlobalExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseCors(allowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
