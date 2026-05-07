@@ -48,11 +48,11 @@ namespace InventoryService.Api.Controllers
         {
             if (id != command.Id)
             {
-                return BadRequest("Id does not match in route vs body");
+                return BadRequest(new { error = "Route ID does not match the ID in the request body." });
             }
 
-            await _mediator.Send(command);
-            return NoContent();
+            var updatedBook =await _mediator.Send(command);
+            return Ok(updatedBook);
         }
 
         //DELETE: api/book/{id}

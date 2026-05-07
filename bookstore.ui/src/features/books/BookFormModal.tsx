@@ -13,7 +13,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
         title: '',
         author: '',
         price: 0,
-        stockQuantity: 0,
+        stockQty: 0,
         categoryId: 1 
     });
     
@@ -23,21 +23,32 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
                 title: initialData.title,
                 author: initialData.author,
                 price: initialData.price,
-                stockQuantity: initialData.stockQty,
+                stockQty: initialData.stockQty,
                 categoryId: initialData.categoryId
             });
         } else {            
-            setFormData({ title: '', author: '', price: 0, stockQuantity: 0, categoryId: 1 });
+            setFormData({ title: '', author: '', price: 0, stockQty: 0, categoryId: 1 });
         }
     }, [initialData, isOpen]);
 
     if (!isOpen) return null;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
+        const { name, value } = e.target;    
+        let processedValue: string | number = value;
+    
+        if (name === 'price') {            
+            processedValue = parseFloat(value) || 0;
+        } else if (name === 'stockQty' || name === 'categoryId') {            
+            processedValue = parseInt(value, 10);            
+            if (isNaN(processedValue)) {
+                processedValue = 0;
+            }
+        }
+        
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value
+            [name]: processedValue,
         }));
     };
 
@@ -65,7 +76,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
                     </div>
                     <div style={formGroupStyle}>
                         <label>Stock Quantity</label>
-                        <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleChange} required />
+                        <input type="number" name="stockQty" value={formData.stockQty} onChange={handleChange} required />
                     </div>                    
                     <div style={formGroupStyle}>
                         <label>Category ID</label>
