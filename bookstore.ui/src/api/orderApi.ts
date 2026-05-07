@@ -1,5 +1,6 @@
-import { OrderDto } from '../models/order';
+import { OrderDto, OrderStatus } from '../models/order';
 import { CreateOrderCommand } from '../models/createOrderCommand';
+import { UpdateOrderCommand } from '../models/updateOrderCommand';
 
 const API_BASE_URL = 'https://localhost:5147/api';
 
@@ -28,8 +29,7 @@ export const createOrder = async (command: CreateOrderCommand, token: string): P
         body: JSON.stringify(command)
     });
 
-    if (!response.ok) {
-        // Try to get more detailed error info from the response body
+    if (!response.ok) {        
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.error || 'Failed to create order.';
         throw new Error(errorMessage);
@@ -49,4 +49,34 @@ export const getOrderById = async (id: number, token: string): Promise<OrderDto>
         throw new Error(`Failed to fetch order with ID ${id}.`);
     }
     return await response.json();
+};
+
+export const updateOrder = async (id: number, command: UpdateOrderCommand, token: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, { 
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(command)
+    });
+
+    if (!response.ok) {        
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.error || errorData?.title || 'Failed to update order.';
+        throw new Error(errorMessage);
+    }
+};
+
+export const deleteOrder = async (id: number, token: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete order.');
+    }
 };
