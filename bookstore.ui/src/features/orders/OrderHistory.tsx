@@ -1,0 +1,82 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useKeycloak } from '@react-keycloak/web';
+import { OrderDto, OrderStatus } from '../../models/order';
+import { getOrders } from '../../api/orderApi';
+
+const getStatusString = (status: OrderStatus): string => {
+    switch (status) {
+        case OrderStatus.Pending: return "Pending";
+        case OrderStatus.Shipped: return "Shipped";
+        case OrderStatus.Completed: return "Completed";
+        case OrderStatus.Cancelled: return "Cancelled";
+        case OrderStatus.OnHold: return "On Hold";
+        default: return "Unknown";
+    }
+};
+
+export const OrderHistory: React.FC = () => {
+    const { keycloak, initialized } = useKeycloak();
+    const [orders, setOrders] = useState<OrderDto[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            if (initialized && keycloak.token) {
+                setLoading(true);
+                try {
+                    const data = await getOrders(keycloak.token);
+                    setOrders(data);
+                } catch (err: any) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchOrders();
+    }, [initialized, keycloak.token]);
+
+    if (loading) return <div>Loading order history...</div>;
+    if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+
+    return (
+        <div>
+            {orders.length === 0 ? (
+                <p>No orders found.</p>
+            ) : (
+                <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Total Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map(order => {
+                            const totalPrice = order.orderItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+                            return (
+                                <tr key={order.id}>
+                                    <td>{order.id}</td>
+                                    <td>{order.customerName}</td>
+                                    <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                                    <td>{getStatusString(order.status)}</td>
+                                    <td>${totalPrice.toFixed(2)}</td>
+                                    <td>
+                                        <Link to={`/orders/${order.id}`}>View Details</Link>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
+};

@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 import { BookDto } from '../../models/book';
 import { getBookById } from '../../api/inventoryApi';
+import { useCart } from '../../context/CartContext';
 
 export const BookDetails: React.FC = () => {    
     const { id } = useParams<{ id: string }>(); 
     const { keycloak, initialized } = useKeycloak();
+    const { addToCart } = useCart();
 
     const [book, setBook] = useState<BookDto | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         const fetchBook = async () => {
@@ -30,6 +33,12 @@ export const BookDetails: React.FC = () => {
         fetchBook();
     }, [initialized, keycloak.token, id]);
 
+    const handleAddToCart = () => {
+        if (book) {
+            addToCart(book, quantity);
+        }
+    };
+
     if (loading) return <div>Loading book details...</div>;
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
     if (!book) return <div>Book not found.</div>;
@@ -40,7 +49,21 @@ export const BookDetails: React.FC = () => {
             <p><strong>Author:</strong> {book.author}</p>
             <p><strong>Price:</strong> ${book.price.toFixed(2)}</p>
             <p><strong>Stock Available:</strong> {book.stockQty}</p>
-            {/* TODO: Add a button to add to cart or something, so that we can have orders */}
+            <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value, 10) || 1)}
+                    min="1"
+                    max={book.stockQty}
+                    style={{ width: '60px', padding: '5px' }}
+                />
+                <button onClick={handleAddToCart} disabled={book.stockQty === 0}>
+                    Add to Cart
+                </button>
+            </div>
+
+            <Link to="/books" style={{ display: 'block', marginTop: '20px' }}>Back to Catalog</Link>
         </div>
     );
 };

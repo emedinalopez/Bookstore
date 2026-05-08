@@ -2,7 +2,7 @@ import { OrderDto, OrderStatus } from '../models/order';
 import { CreateOrderCommand } from '../models/createOrderCommand';
 import { UpdateOrderCommand } from '../models/updateOrderCommand';
 
-const API_BASE_URL = 'https://localhost:5147/api';
+const API_BASE_URL = 'http://localhost:5147/api';
 
 export const getOrders = async (token: string): Promise<OrderDto[]> => {
     const response = await fetch(`${API_BASE_URL}/orders`, {
