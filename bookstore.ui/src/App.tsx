@@ -7,6 +7,7 @@ import { BookDetails } from './features/books/BookDetails';
 import { PlaceOrderForm } from './features/orders/PlaceOrderForm';
 import { OrdersPage } from './pages/OrdersPage';
 import { OrderDetails } from './features/orders/OrderDetails';
+import { CategoriesPage } from './pages/CategoriesPage';
 
 const CartIndicator = () => {
     const { cartItems } = useCart();
@@ -30,6 +31,7 @@ function App() {
                     <nav style={{ display: 'flex', gap: '20px' }}>
                         <Link to="/">Dashboard</Link>
                         <Link to="/books">Inventory</Link>
+                        <Link to="/categories">Categories</Link>
                         <Link to="/orders">Orders</Link>                        
                         <CartIndicator />
                     </nav>
@@ -43,6 +45,7 @@ function App() {
                         <Route path="/place-order" element={<PlaceOrderForm />} />                        
                         <Route path="/orders" element={<OrdersPage />} />
                         <Route path="/orders/:id" element={<OrderDetails />} />
+                        <Route path="/categories" element={<CategoriesPage />} />
                     </Routes>
                 </main>
             </div>

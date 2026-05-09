@@ -105,7 +105,7 @@ export const deleteBook = async (id: number, token: string): Promise<void> => {
 };
 
 export const getCategories = async (token: string): Promise<CategoryDto[]> => {
-    const response = await fetch(`${API_BASE_URL}/category`, {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to fetch categories.');
@@ -113,7 +113,7 @@ export const getCategories = async (token: string): Promise<CategoryDto[]> => {
 };
 
 export const createCategory = async (command: CreateCategoryCommand, token: string): Promise<CategoryDto> => {
-    const response = await fetch(`${API_BASE_URL}/category`, {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export const createCategory = async (command: CreateCategoryCommand, token: stri
 };
 
 export const updateCategory = async (id: number, command: UpdateCategoryCommand, token: string): Promise<CategoryDto> => {
-    const response = await fetch(`${API_BASE_URL}/category/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export const updateCategory = async (id: number, command: UpdateCategoryCommand,
 };
 
 export const deleteCategory = async (id: number, token: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/category/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`

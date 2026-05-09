@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import { BookDto } from '../../models/book';
+import { CategoryDto } from '../../models/category';
+import { getCategories } from '../../api/inventoryApi';
 
 interface BookFormModalProps {
     isOpen: boolean;
@@ -9,13 +12,34 @@ interface BookFormModalProps {
 }
 
 export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+    const { keycloak, initialized } = useKeycloak();
+    const [categories, setCategories] = useState<CategoryDto[]>([]);
+
     const [formData, setFormData] = useState({
         title: '',
         author: '',
         price: 0,
         stockQty: 0,
-        categoryId: 1 
+        categoryId: 1
     });
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            if (isOpen && initialized && keycloak.token) {
+                try {
+                    const data = await getCategories(keycloak.token);
+                    setCategories(data);
+                                        
+                    if (!initialData && data.length > 0) {
+                        setFormData(prev => ({ ...prev, categoryId: data[0].id }));
+                    }
+                } catch (error) {
+                    console.error("Failed to load categories for dropdown", error);
+                }
+            }
+        };
+        fetchCategories();
+    }, [isOpen, initialized, keycloak.token, initialData]);
     
     useEffect(() => {
         if (initialData) {
@@ -33,7 +57,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
 
     if (!isOpen) return null;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;    
         let processedValue: string | number = value;
     
@@ -79,8 +103,21 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
                         <input type="number" name="stockQty" value={formData.stockQty} onChange={handleChange} required />
                     </div>                    
                     <div style={formGroupStyle}>
-                        <label>Category ID</label>
-                        <input type="number" name="categoryId" value={formData.categoryId} onChange={handleChange} required />
+                        <label>Category</label>
+                        <select 
+                            name="categoryId" 
+                            value={formData.categoryId} 
+                            onChange={handleChange} 
+                            required
+                            style={{ padding: '5px' }} 
+                        >                            
+                            {categories.length === 0 && <option value="" disabled>Loading categories...</option>}
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                         <button type="button" onClick={onClose}>Cancel</button>
