@@ -1,4 +1,5 @@
 import { BookDto } from '../models/book';
+import { CategoryDto } from '../models/category';
 
 const API_BASE_URL = 'http://localhost:5053/api'; 
 
@@ -17,6 +18,15 @@ export interface UpdateBookCommand {
     price: number;
     stockQuantity: number;
     categoryId: number;
+}
+
+export interface CreateCategoryCommand {
+    name: string;
+}
+
+export interface UpdateCategoryCommand {
+    id: number;
+    name: string;
 }
 
 export const getBooks = async (token: string): Promise<BookDto[]> => {
@@ -92,4 +102,54 @@ export const deleteBook = async (id: number, token: string): Promise<void> => {
         }
     });
     if (!response.ok) throw new Error('Failed to delete book.');
+};
+
+export const getCategories = async (token: string): Promise<CategoryDto[]> => {
+    const response = await fetch(`${API_BASE_URL}/category`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch categories.');
+    return await response.json();
+};
+
+export const createCategory = async (command: CreateCategoryCommand, token: string): Promise<CategoryDto> => {
+    const response = await fetch(`${API_BASE_URL}/category`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(command)
+    });
+    if (!response.ok) throw new Error('Failed to create category.');
+    return await response.json();
+};
+
+export const updateCategory = async (id: number, command: UpdateCategoryCommand, token: string): Promise<CategoryDto> => {
+    const response = await fetch(`${API_BASE_URL}/category/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(command)
+    });
+    if (!response.ok) throw new Error('Failed to update category.');
+    return await response.json();
+};
+
+export const deleteCategory = async (id: number, token: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/category/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (!response.ok) {        
+        if (response.status === 400) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to delete category.');
+        }
+        throw new Error('Failed to delete category.');
+    }
 };
