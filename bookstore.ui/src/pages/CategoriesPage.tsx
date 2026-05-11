@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { Button } from 'react-bootstrap';
 import { CategoryDto } from '../models/category';
 import { createCategory, updateCategory, UpdateCategoryCommand } from '../api/inventoryApi';
 import { CategoryList } from '../features/categories/CategoryList';
@@ -42,14 +43,16 @@ export const CategoriesPage: React.FC = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2>Category Management</h2>
-                <button onClick={handleOpenCreate}>+ Add New Category</button>
+                <Button variant="success" size="lg" onClick={handleOpenCreate}>
+                    + Add New Category
+                </Button>
             </div>
             
             <CategoryList refreshTrigger={refreshTrigger} onEdit={handleOpenEdit} />
 
             <CategoryFormModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                show={isModalOpen}
+                onHide={() => setIsModalOpen(false)}
                 onSubmit={handleSubmit}
                 initialData={editingCategory}
             />

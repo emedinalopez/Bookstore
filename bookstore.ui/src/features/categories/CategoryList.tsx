@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { Table, Button } from 'react-bootstrap';
 import { CategoryDto } from '../../models/category';
 import { getCategories, deleteCategory } from '../../api/inventoryApi';
 
@@ -46,7 +47,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ refreshTrigger, onEd
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
     return (
-        <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <Table striped bordered hover responsive>
             <thead>
                 <tr>
                     <th>ID</th>
@@ -59,13 +60,17 @@ export const CategoryList: React.FC<CategoryListProps> = ({ refreshTrigger, onEd
                     <tr key={cat.id}>
                         <td>{cat.id}</td>
                         <td>{cat.name}</td>
-                        <td>
-                            <button onClick={() => onEdit(cat)}>Edit</button>
-                            <button onClick={() => handleDelete(cat.id)} style={{ marginLeft: '5px' }}>Delete</button>
+                        <td>                            
+                            <Button variant="primary" size="sm" onClick={() => onEdit(cat)}>
+                                Edit
+                            </Button>
+                            <Button variant="danger" size="sm" onClick={() => handleDelete(cat.id)} className="ms-2">
+                                Delete
+                            </Button>
                         </td>
                     </tr>
                 ))}
             </tbody>
-        </table>
+        </Table>
     );
 };

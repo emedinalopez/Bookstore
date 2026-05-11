@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { CategoryDto } from '../../models/category';
 
 interface CategoryFormModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+    show: boolean;
+    onHide: () => void;
     onSubmit: (formData: { name: string }) => void;
     initialData?: CategoryDto | null;
 }
 
-export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ show, onHide, onSubmit, initialData }) => {
     const [name, setName] = useState('');
 
     useEffect(() => {
         setName(initialData ? initialData.name : '');
-    }, [initialData, isOpen]);
+    }, [initialData, show]);
 
-    if (!isOpen) return null;
+    if (!show) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,21 +24,33 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ isOpen, on
     };
 
     return (
-        <div style={modalOverlayStyle}>
-            <div style={modalContentStyle}>
-                <h2>{initialData ? 'Edit Category' : 'Create New Category'}</h2>
-                <form onSubmit={handleSubmit}>
-                    <div style={formGroupStyle}>
-                        <label>Category Name</label>
-                        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-                    </div>
-                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                        <button type="button" onClick={onClose}>Cancel</button>
-                        <button type="submit">{initialData ? 'Update' : 'Create'}</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>{initialData ? 'Edit Category' : 'Create New Category'}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="formCategoryName">
+                        <Form.Label>Category Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            autoFocus
+                        />
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={handleSubmit}>
+                    {initialData ? 'Update Category' : 'Create Category'}
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 
