@@ -3,11 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 import { Card, ListGroup, Button, Spinner } from 'react-bootstrap';
 import { getOrderById } from '../../api/orderApi';
-import { OrderDto, OrderStatus } from '../../models/order';
-
-const getStatusString = (status: OrderStatus): string => {    
-    return "Status";
-};
+import { OrderDto } from '../../models/order';
 
 export const OrderDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -47,7 +43,7 @@ export const OrderDetails: React.FC = () => {
             <Card.Body>
                 <Card.Text><strong>Customer:</strong> {order.customerName}</Card.Text>
                 <Card.Text><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</Card.Text>
-                <Card.Text><strong>Status:</strong> {getStatusString(order.status)}</Card.Text>
+                <Card.Text><strong>Status:</strong> {order.status}</Card.Text>
                 <hr />
                 <h4>Items Ordered</h4>
                 <ListGroup variant="flush">
