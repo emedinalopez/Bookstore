@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { Modal, Button, Form } from 'react-bootstrap';
 import { BookDto } from '../../models/book';
 import { CategoryDto } from '../../models/category';
 import { getCategories } from '../../api/inventoryApi';
 
 interface BookFormModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+    show: boolean;
+    onHide: () => void;
     onSubmit: (formData: any) => void;
     initialData?: BookDto | null;
 }
 
-export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+export const BookFormModal: React.FC<BookFormModalProps> = ({ show, onHide, onSubmit, initialData }) => {
     const { keycloak, initialized } = useKeycloak();
     const [categories, setCategories] = useState<CategoryDto[]>([]);
 
@@ -25,7 +26,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
 
     useEffect(() => {
         const fetchCategories = async () => {
-            if (isOpen && initialized && keycloak.token) {
+            if (show && initialized && keycloak.token) {
                 try {
                     const data = await getCategories(keycloak.token);
                     setCategories(data);
@@ -39,7 +40,7 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
             }
         };
         fetchCategories();
-    }, [isOpen, initialized, keycloak.token, initialData]);
+    }, [show, initialized, keycloak.token, initialData]);
     
     useEffect(() => {
         if (initialData) {
@@ -53,11 +54,11 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
         } else {            
             setFormData({ title: '', author: '', price: 0, stockQty: 0, categoryId: 1 });
         }
-    }, [initialData, isOpen]);
+    }, [initialData, show]);
 
-    if (!isOpen) return null;
+    if (!show) return null;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: any) => {
         const { name, value } = e.target;    
         let processedValue: string | number = value;
     
@@ -82,50 +83,52 @@ export const BookFormModal: React.FC<BookFormModalProps> = ({ isOpen, onClose, o
     };
 
     return (
-        <div style={modalOverlayStyle}>
-            <div style={modalContentStyle}>
-                <h2>{initialData ? 'Edit Book' : 'Create New Book'}</h2>
-                <form onSubmit={handleSubmit}>
-                    <div style={formGroupStyle}>
-                        <label>Title</label>
-                        <input type="text" name="title" value={formData.title} onChange={handleChange} required />
-                    </div>
-                    <div style={formGroupStyle}>
-                        <label>Author</label>
-                        <input type="text" name="author" value={formData.author} onChange={handleChange} required />
-                    </div>
-                    <div style={formGroupStyle}>
-                        <label>Price</label>
-                        <input type="number" name="price" value={formData.price} onChange={handleChange} step="0.01" required />
-                    </div>
-                    <div style={formGroupStyle}>
-                        <label>Stock Quantity</label>
-                        <input type="number" name="stockQty" value={formData.stockQty} onChange={handleChange} required />
-                    </div>                    
-                    <div style={formGroupStyle}>
-                        <label>Category</label>
-                        <select 
-                            name="categoryId" 
-                            value={formData.categoryId} 
-                            onChange={handleChange} 
-                            required
-                            style={{ padding: '5px' }} 
-                        >                            
-                            {categories.length === 0 && <option value="" disabled>Loading categories...</option>}
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>{initialData ? 'Edit Book' : 'Create New Book'}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3" controlId="formBookTitle">
+                        <Form.Label>Title</Form.Label>
+                        <Form.Control type="text" name="title" value={formData.title} onChange={handleChange} required />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBookAuthor">
+                        <Form.Label>Author</Form.Label>
+                        <Form.Control type="text" name="author" value={formData.author} onChange={handleChange} required />
+                    </Form.Group>
+                    
+                    <Form.Group className="mb-3" controlId="formBookPrice">
+                        <Form.Label>Price</Form.Label>
+                        <Form.Control type="number" name="price" value={formData.price} onChange={handleChange} step="0.01" required />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBookStock">
+                        <Form.Label>Stock Quantity</Form.Label>
+                        <Form.Control type="number" name="stockQuantity" value={formData.stockQty} onChange={handleChange} required />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBookCategory">
+                        <Form.Label>Category</Form.Label>
+                        <Form.Select name="categoryId" value={formData.categoryId} onChange={handleChange} required>
+                            {categories.length === 0 && <option disabled>Loading...</option>}
                             {categories.map(cat => (
-                                <option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </option>
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
                             ))}
-                        </select>
-                    </div>
-                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                        <button type="button" onClick={onClose}>Cancel</button>
-                        <button type="submit">{initialData ? 'Update' : 'Create'}</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                        </Form.Select>
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={handleSubmit}>
+                    {initialData ? 'Update Book' : 'Create Book'}
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 
