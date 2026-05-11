@@ -27,9 +27,14 @@ export const PlaceOrderForm: React.FC = () => {
             unitPrice: item.price
         }));
 
-        const command: CreateOrderCommand = {
-            customerName,
-            orderItems
+        const command = { 
+            customerName: customerName,
+            items: cartItems.map(item => ({
+                bookId: item.id,
+                bookTitle: item.title,
+                quantity: item.orderQuantity,
+                unitPrice: item.price
+            }))
         };
 
         try {

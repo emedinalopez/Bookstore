@@ -6,5 +6,5 @@ export interface OrderItemCommand {
 
 export interface CreateOrderCommand {
     customerName: string;
-    orderItems: OrderItemCommand[];
+    items: OrderItemCommand[];
 }
