@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
+import { Card, ListGroup, Button, Spinner } from 'react-bootstrap';
 import { getOrderById } from '../../api/orderApi';
 import { OrderDto, OrderStatus } from '../../models/order';
 
@@ -34,29 +35,35 @@ export const OrderDetails: React.FC = () => {
         fetchOrder();
     }, [initialized, keycloak.token, id]);
 
-    if (loading) return <div>Loading order details...</div>;
-    if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-    if (!order) return <div>Order not found.</div>;
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <p className="text-danger">Error: {error}</p>;
+    if (!order) return <p>Order not found.</p>;
     
     const totalPrice = order.orderItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
 
     return (
-        <div>
-            <h2>Order Details - ID: {order.id}</h2>
-            <p><strong>Customer:</strong> {order.customerName}</p>
-            <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
-            <p><strong>Status:</strong> {getStatusString(order.status)}</p>
-            <hr />
-            <h3>Items</h3>
-            <ul>
-                {order.orderItems.map(item => (
-                    <li key={item.id}>
-                        Book ID: {item.bookId} - {item.quantity} x ${item.unitPrice.toFixed(2)}
-                    </li>
-                ))}
-            </ul>
-            <h3>Total: ${totalPrice.toFixed(2)}</h3>
-            <Link to="/orders" style={{ display: 'block', marginTop: '20px' }}>Back to Order History</Link>
-        </div>
+        <Card>
+            <Card.Header as="h3">Order Details - ID: {order.id}</Card.Header>
+            <Card.Body>
+                <Card.Text><strong>Customer:</strong> {order.customerName}</Card.Text>
+                <Card.Text><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</Card.Text>
+                <Card.Text><strong>Status:</strong> {getStatusString(order.status)}</Card.Text>
+                <hr />
+                <h4>Items Ordered</h4>
+                <ListGroup variant="flush">
+                    {order.orderItems.map(item => (
+                        <ListGroup.Item key={item.id}>
+                            Book ID: {item.bookId} - {item.quantity} x ${item.unitPrice.toFixed(2)}
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+            </Card.Body>
+            <Card.Footer className="d-flex justify-content-between align-items-center">
+                <h4>Total: ${totalPrice.toFixed(2)}</h4>
+                <Link to="/orders">
+                    <Button variant="secondary">Back to Order History</Button>
+                </Link>
+            </Card.Footer>
+        </Card>
     );
 };
