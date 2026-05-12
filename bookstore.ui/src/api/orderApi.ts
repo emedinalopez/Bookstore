@@ -1,4 +1,4 @@
-import { OrderDto, OrderStatus } from '../models/order';
+import { OrderDto } from '../models/order';
 import { CreateOrderCommand } from '../models/createOrderCommand';
 import { UpdateOrderCommand } from '../models/updateOrderCommand';
 

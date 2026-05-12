@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Button, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
 import { BookDto } from '../../models/book';
@@ -71,8 +72,8 @@ export const BookList: React.FC<BookListProps> = ({ refreshTrigger }) => {
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
     return (
-        <>
-            <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <>            
+            <Table striped bordered hover responsive>
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -91,18 +92,22 @@ export const BookList: React.FC<BookListProps> = ({ refreshTrigger }) => {
                             <td>{book.author}</td>
                             <td>${book.price.toFixed(2)}</td>
                             <td>{book.stockQty}</td>
-                            <td>
-                                <button onClick={() => handleUpdate(book)}>Edit</button>
-                                <button onClick={() => handleDelete(book.id)} style={{ marginLeft: '5px' }}>Delete</button>
+                            <td>                                
+                                <Button variant="primary" size="sm" onClick={() => handleUpdate(book)}>
+                                    Edit
+                                </Button>
+                                <Button variant="danger" size="sm" onClick={() => handleDelete(book.id)} className="ms-2">
+                                    Delete
+                                </Button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
-            
+            </Table>
+
             <BookFormModal
-                isOpen={isUpdateModalOpen}
-                onClose={() => setIsUpdateModalOpen(false)}
+                show={isUpdateModalOpen}
+                onHide={() => setIsUpdateModalOpen(false)}
                 onSubmit={handleUpdateSubmit}
                 initialData={selectedBook}
             />

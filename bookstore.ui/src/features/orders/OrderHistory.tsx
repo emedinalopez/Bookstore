@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useKeycloak } from '@react-keycloak/web';
-import { OrderDto, OrderStatus } from '../../models/order';
+import { Table, Button } from 'react-bootstrap';
+import { OrderDto } from '../../models/order';
 import { getOrders } from '../../api/orderApi';
-
-const getStatusString = (status: OrderStatus): string => {
-    switch (status) {
-        case OrderStatus.Pending: return "Pending";
-        case OrderStatus.Shipped: return "Shipped";
-        case OrderStatus.Completed: return "Completed";
-        case OrderStatus.Cancelled: return "Cancelled";
-        case OrderStatus.OnHold: return "On Hold";
-        default: return "Unknown";
-    }
-};
 
 export const OrderHistory: React.FC = () => {
     const { keycloak, initialized } = useKeycloak();
@@ -46,8 +36,8 @@ export const OrderHistory: React.FC = () => {
         <div>
             {orders.length === 0 ? (
                 <p>No orders found.</p>
-            ) : (
-                <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
+            ) : (                
+                <Table striped bordered hover responsive>
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -66,16 +56,18 @@ export const OrderHistory: React.FC = () => {
                                     <td>{order.id}</td>
                                     <td>{order.customerName}</td>
                                     <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                                    <td>{getStatusString(order.status)}</td>
+                                    <td>{order.status}</td>
                                     <td>${totalPrice.toFixed(2)}</td>
                                     <td>
-                                        <Link to={`/orders/${order.id}`}>View Details</Link>
+                                        <Link to={`/orders/${order.id}`}>
+                                            <Button variant="info" size="sm">View Details</Button>
+                                        </Link>
                                     </td>
                                 </tr>
                             );
                         })}
                     </tbody>
-                </table>
+                </Table>
             )}
         </div>
     );

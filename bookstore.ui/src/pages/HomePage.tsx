@@ -1,44 +1,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card, Button, Row, Col } from 'react-bootstrap';
 
 export const HomePage: React.FC = () => {
     return (
         <div>
             <h2>Welcome to the Dashboard</h2>
             <p>Select a module to manage your store:</p>
-
-            <div style={{ display: 'flex', gap: '20px', marginTop: '30px' }}>
-                {/* Link to the Books Catalog */}
-                <Link 
-                    to="/books" 
-                    style={cardStyle}
-                >
-                    <h3 style={{ marginTop: 0 }}>📚 Inventory</h3>
-                    <p>Browse the book catalog, manage stock, and view book details.</p>
-                </Link>
-
-                {/* Link to the Orders */}
-                <Link 
-                    to="/orders" 
-                    style={cardStyle}
-                >
-                    <h3 style={{ marginTop: 0 }}>📦 Orders</h3>
-                    <p>View order history, check order statuses, and place new orders.</p>
-                </Link>
-            </div>
+            
+            <Row className="mt-4">
+                <Col md={6} lg={4} className="mb-3">                    
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>📚 Inventory</Card.Title>
+                            <Card.Text>
+                                Browse the book catalog, manage stock, and view book details.
+                            </Card.Text>
+                            <Link to="/books">
+                                <Button variant="primary">Go to Inventory</Button>
+                            </Link>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col md={6} lg={4} className="mb-3">
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>📦 Orders</Card.Title>
+                            <Card.Text>
+                                View order history, check order statuses, and place new orders.
+                            </Card.Text>
+                            <Link to="/orders">
+                                <Button variant="primary">Go to Orders</Button>
+                            </Link>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
         </div>
     );
-};
-
-const cardStyle: React.CSSProperties = {
-    display: 'block',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    padding: '20px',
-    width: '250px',
-    textDecoration: 'none',
-    color: '#333',
-    backgroundColor: '#f9f9f9',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s'
 };

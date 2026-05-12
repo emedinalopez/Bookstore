@@ -1,20 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { CartProvider, useCart } from './context/CartContext';
+import { Navbar, Nav, Container } from 'react-bootstrap';
 import { HomePage } from './pages/HomePage';
 import { BooksPage } from './pages/BooksPage';
 import { BookDetails } from './features/books/BookDetails';
 import { PlaceOrderForm } from './features/orders/PlaceOrderForm';
 import { OrdersPage } from './pages/OrdersPage';
 import { OrderDetails } from './features/orders/OrderDetails';
+import { CategoriesPage } from './pages/CategoriesPage';
 
 const CartIndicator = () => {
     const { cartItems } = useCart();
     const itemCount = cartItems.reduce((sum, item) => sum + item.orderQuantity, 0);
     return (
-        <Link to="/place-order">
+        <Nav.Link as={Link} to="/place-order">
             Cart ({itemCount})
-        </Link>
+        </Nav.Link>
     );
 };
 
@@ -22,30 +24,37 @@ function App() {
   return (    
     <CartProvider>
         <Router>
-            <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-                    <Link to="/" style={{ textDecoration: 'none', color: 'black' }}>
-                        <h1>Bookstore</h1>
-                    </Link>
-                    <nav style={{ display: 'flex', gap: '20px' }}>
-                        <Link to="/">Dashboard</Link>
-                        <Link to="/books">Inventory</Link>
-                        <Link to="/orders">Orders</Link>                        
-                        <CartIndicator />
-                    </nav>
-                </header>
-                
+            <Navbar bg="dark" variant="dark" expand="lg" className="mb-4">
+                <Container>
+                    <Navbar.Brand as={Link} to="/">Bookstore</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="me-auto">
+                            <Nav.Link as={Link} to="/">Dashboard</Nav.Link>
+                            <Nav.Link as={Link} to="/books">Inventory</Nav.Link>
+                            <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
+                            <Nav.Link as={Link} to="/orders">Orders</Nav.Link>
+                        </Nav>
+                        <Nav>
+                            <CartIndicator />
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+                        
+            <Container>
                 <main>
-                    <Routes>
+                    <Routes>                        
                         <Route path="/" element={<HomePage />} />
                         <Route path="/books" element={<BooksPage />} />
-                        <Route path="/books/:id" element={<BookDetails />} />                        
-                        <Route path="/place-order" element={<PlaceOrderForm />} />                        
+                        <Route path="/categories" element={<CategoriesPage />} />
+                        <Route path="/books/:id" element={<BookDetails />} />
+                        <Route path="/place-order" element={<PlaceOrderForm />} />
                         <Route path="/orders" element={<OrdersPage />} />
                         <Route path="/orders/:id" element={<OrderDetails />} />
                     </Routes>
                 </main>
-            </div>
+            </Container>
         </Router>
     </CartProvider>
   );

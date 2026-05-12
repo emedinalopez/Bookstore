@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { Button } from 'react-bootstrap';
 import { BookList } from '../features/books/BookList';
 import { BookFormModal } from '../features/books/BookFormModal';
 import { createBook, CreateBookCommand } from '../api/inventoryApi';
@@ -25,14 +26,16 @@ export const BooksPage: React.FC = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2>Inventory Management</h2>
-                <button onClick={() => setIsModalOpen(true)}>+ Add New Book</button>
+                <Button variant="success" size="lg" onClick={() => setIsModalOpen(true)}>
+                    + Add New Book
+                </Button>
             </div>
             
             <BookList refreshTrigger={refreshList} />
 
             <BookFormModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                show={isModalOpen}
+                onHide={() => setIsModalOpen(false)}
                 onSubmit={handleCreateBook}
             />
         </div>
